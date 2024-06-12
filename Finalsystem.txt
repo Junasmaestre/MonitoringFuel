@@ -1,0 +1,77 @@
+import java.util.Timer;
+import java.util.TimerTask;
+
+public class VehicleConsumptionMonitor {
+    private double fuelLevel; // in liters
+    private double distanceTraveled; // in kilometers
+    private double fuelEfficiency; // in kilometers per liter
+    private Timer timer;
+    private long startTime;
+
+    public VehicleConsumptionMonitor(double initialFuelLevel, double initialFuelEfficiency) {
+        this.fuelLevel = initialFuelLevel;
+        this.distanceTraveled = 0.0;
+        this.fuelEfficiency = initialFuelEfficiency;
+        this.timer = new Timer();
+        this.startTime = System.currentTimeMillis();
+    }
+
+    public void startMonitoring() {
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                simulateVehicleOperation();
+                displayStatus();
+                checkTimeLimit();
+            }
+        }, 0, 3000); // 3 seconds interval (3000 milliseconds)
+    }
+
+    private void simulateVehicleOperation() {
+        // Simulate vehicle operation (e.g., driving, idling) for demonstration purposes
+        double speed = 60.0; // km/h
+        double timeInterval = 3.0 / 3600.0; // 3 seconds converted to hours
+        double distanceCovered = speed * timeInterval;
+        distanceTraveled += distanceCovered;
+
+        // Simulate fuel consumption based on distance covered and fuel efficiency (for demonstration purposes)
+        double fuelConsumed = distanceCovered / fuelEfficiency;
+        fuelLevel -= fuelConsumed;
+
+        // Simulate refueling when fuel level is low (for demonstration purposes)
+        if (fuelLevel < 5.0) { // Low fuel threshold (e.g., 5 liters)
+            refuel();
+        }
+    }
+
+    private void refuel() {
+        // Simulate refueling by adding fuel to the tank (for demonstration purposes)
+        double refuelAmount = 20.0; // liters
+        fuelLevel += refuelAmount;
+        System.out.println("Low fuel level! Refueling " + refuelAmount + " liters.");
+    }
+
+    private void displayStatus() {
+        System.out.println("Distance Traveled: " + distanceTraveled + " km");
+        System.out.println("Fuel Level: " + fuelLevel + " liters");
+        System.out.println("-------------------------");
+    }
+
+    private void checkTimeLimit() {
+        long currentTime = System.currentTimeMillis();
+        long elapsedTime = currentTime - startTime;
+        if (elapsedTime >= 60000) { // 1 minute in milliseconds
+            stopMonitoring();
+        }
+    }
+
+    private void stopMonitoring() {
+        timer.cancel();
+        System.out.println("Monitoring stopped after 1 minute.");
+    }
+
+    public static void main(String[] args) {
+        VehicleConsumptionMonitor monitor = new VehicleConsumptionMonitor(50.0, 10.0); // Initial fuel level in liters, initial fuel efficiency in km/l
+        monitor.startMonitoring();
+    }
+}
